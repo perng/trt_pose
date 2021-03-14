@@ -96,19 +96,20 @@ def execute(change):
     data = preprocess(image)
     cmap, paf = model_trt(data)
     cmap, paf = cmap.detach().cpu(), paf.detach().cpu()
+    # counts is the number of people
     counts, objects, peaks = parse_objects(cmap, paf)#, cmap_threshold=0.15, link_threshold=0.15)
     draw_objects(image, counts, objects, peaks)
     frame += 1
-    if frame % 10 == 0:
+    if frame % 50 == 0:
         #print(cmap, paf, counts, objects, peaks)
         #print('cmap', cmap)
         #print('paf', paf)
-        print('counts', counts[0])
-        print('objects', objects.shape)
-        print('peaks', peaks.shape)
+        #print('counts', counts, counts.shape, counts[0])
+        print('objects', objects[0][0:3])
+        print('peaks', peaks[0][0][0:3])
         
         t1 = time.time()
-        print('FPS = ', frame/(t1-t0))
+        #print('FPS = ', frame/(t1-t0))
     cv2.imshow('monitor', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         sys.exit(0)
