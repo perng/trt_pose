@@ -71,7 +71,8 @@ from jetcam.usb_camera import USBCamera
 # from jetcam.csi_camera import CSICamera
 from jetcam.utils import bgr8_to_jpeg
 
-camera = USBCamera(capture_device=1, width=WIDTH, height=HEIGHT, capture_fps=30)
+camera = USBCamera(capture_device=0, width=WIDTH, height=HEIGHT, capture_fps=10)
+#time.sleep(1)
 # camera = CSICamera(width=WIDTH, height=HEIGHT, capture_fps=30)
 
 camera.running = True
@@ -100,7 +101,7 @@ def execute(change):
     counts, objects, peaks = parse_objects(cmap, paf)#, cmap_threshold=0.15, link_threshold=0.15)
     draw_objects(image, counts, objects, peaks)
     frame += 1
-    if frame % 50 == 0:
+    if counts[0] > 0:
         #print(cmap, paf, counts, objects, peaks)
         #print('cmap', cmap)
         #print('paf', paf)
@@ -110,6 +111,7 @@ def execute(change):
         
         t1 = time.time()
         #print('FPS = ', frame/(t1-t0))
+        return
     cv2.imshow('monitor', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         sys.exit(0)

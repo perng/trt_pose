@@ -1,0 +1,2 @@
+create table data (timestamp real, count int, objects blob, peaks blob);
+

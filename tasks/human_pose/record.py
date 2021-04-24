@@ -111,7 +111,7 @@ draw_objects = DrawObjects(topology)
 from jetcam.usb_camera import USBCamera
 from jetcam.utils import bgr8_to_jpeg
 
-camera = USBCamera(capture_device=1, width=WIDTH, height=HEIGHT, capture_fps=30)
+camera = USBCamera(capture_device=0, width=WIDTH, height=HEIGHT, capture_fps=30)
 camera.running = True
 
 t1 = time.time()
@@ -134,19 +134,19 @@ def execute(change):
     counts, objects, peaks = parse_objects(cmap, paf)#, cmap_threshold=0.15, link_threshold=0.15)
     draw_objects(image, counts, objects, peaks)
     frame += 1
+    count = int(counts.numpy()[0])
     if frame % 50 == 0:
         #print(cmap, paf, counts, objects, peaks)
         #print('cmap', cmap)
         #print('paf', paf)
-        #print('counts', counts, counts.shape, counts[0])
-        #print('objects', objects[0][0:3])
-        #print('peaks', peaks[0][0][0:3])
         
         t1 = time.time()
         #print('FPS = ', frame/(t1-t0))
-    count = counts.numpy()[0]
     if count > 0:
-        data_queue.append((time.time(), count, objects[:,:count,:].numpy().tobytes(), peaks[:,:,:count,:].numpy().tobytes()))
+        data_queue.append((time.time(), count, objects[:,0:count,:].numpy().tobytes(), peaks[:,:,0:count,:].numpy().tobytes()))
+        #print(objects.shape)
+        #print(objects)
+        #sys.exit(0)
         
     if len(data_queue) > 100:
         process(data_queue)
