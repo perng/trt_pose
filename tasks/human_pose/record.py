@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 import time, sys, logging, psutil
 t0 = time.time()
 from torch2trt import TRTModule
@@ -19,6 +20,7 @@ logging.basicConfig(filename='data.log', level=logging.DEBUG)
 def adapt_array(arr):
     """
     http://stackoverflow.com/a/31312102/190597 (SoulNibbler)
+    Converts np.array to TEXT
     """
     out = io.BytesIO()
     np.save(out, arr)
@@ -26,6 +28,9 @@ def adapt_array(arr):
     return sqlite3.Binary(out.read())
 
 def convert_array(text):
+    """
+    Convert text to np.array
+    """
     out = io.BytesIO(text)
     out.seek(0)
     return np.load(out)
@@ -50,15 +55,13 @@ def create_connection(db_file):
 
 def process(data_queue):
     mem = psutil.virtual_memory()._asdict()
-    logging.info("Before commit: percent: %f\t free:%d" % (mem['percent'],mem['free']))
+    #logging.info("Before commit: percent: %f\t free:%d" % (mem['percent'],mem['free']))
     conn = create_connection('posedata.db')
     for d in data_queue:
         conn.cursor().execute(sql, d)
     conn.commit()
-    logging.info("After commit: percent: %f\t free:%d" % (mem['percent'],mem['free']))
+    #logging.info("After commit: percent: %f\t free:%d" % (mem['percent'],mem['free']))
     conn.close()
-
-
 
 
 t1 = time.time()
@@ -111,7 +114,7 @@ draw_objects = DrawObjects(topology)
 from jetcam.usb_camera import USBCamera
 from jetcam.utils import bgr8_to_jpeg
 
-camera = USBCamera(capture_device=0, width=WIDTH, height=HEIGHT, capture_fps=30)
+camera = USBCamera(capture_device=1, width=WIDTH, height=HEIGHT, capture_fps=30)
 camera.running = True
 
 t1 = time.time()
